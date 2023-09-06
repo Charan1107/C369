@@ -1,0 +1,105 @@
+package com.amazonaws.samples; 
+import java.sql.DriverManager; 
+import java.sql.PreparedStatement; 
+import java.sql.ResultSet; 
+import java.sql.SQLException; 
+import java.sql.Statement; 
+import java.sql.Connection; 
+
+
+public class RDSEx { 
+public static void display(Connection conn) throws SQLException{ 
+String query = "select * from Employee"; 
+Statement stmt = conn.createStatement(); 
+ResultSet rs = stmt.executeQuery(query); 
+while(rs.next()) { 
+System.out.println("\nRecord\n========================================="); System.out.println("Emp ID : "+rs.getInt(1)); 
+System.out.println("Emp Name : "+rs.getString(2)); 
+} 
+}
+
+ 
+public static void main(String[] args) { 
+try { 
+Class.forName("com.mysql.cj.jdbc.Driver"); 
+Connection conn = DriverManager.getConnection("jdbc:mysql://database 
+2.cnaq7zscforp.us-east-1.rds.amazonaws.com:3306/Test","admin","admin123"); System.out.println("Connection Successful"); 
+String query1 = "create table Employee(empid int,ename varchar(50))"; 
+Statement stmt = conn.createStatement(); 
+stmt.executeUpdate(query1); 
+System.out.println("Table Created Successfully"); 
+
+
+System.out.println("Inserting Records"); 
+String str = "insert into Employee(empid,ename) values(?,?)"; 
+PreparedStatement pstmt = conn.prepareStatement(str); 
+pstmt.setInt(1, 428); 
+pstmt.setString(2, "Mohith"); 
+int nr = pstmt.executeUpdate(); 
+pstmt = conn.prepareStatement(str); 
+pstmt.setInt(1, 417); 
+pstmt.setString(2, "Tharun");
+nr = 1+pstmt.executeUpdate(); 
+pstmt.setInt(1, 421); 
+pstmt.setString(2, "Sudheesh");
+nr = 1+pstmt.executeUpdate(); 
+System.out.println(nr+" of records executed"); 
+display(conn); 
+
+
+System.out.println("Updating Records"); 
+String query3 = "update Employee set ename ="+"Mohith Agasthyeswar"+"where empid=428"; nr = stmt.executeUpdate(query3); 
+System.out.println(nr+" of records affected"); 
+display(conn); 
+
+
+System.out.println("\nDeleting Table\n=================="); 
+query1 = "Drop table Employee"; 
+stmt.executeUpdate(query1); 
+} 
+catch(SQLException|ClassNotFoundException e) { 
+e.printStackTrace(); 
+} 
+}
+} 
+
+
+Output: 
+Connection Successful 
+Table Created Successfully 
+Inserting Records 
+2of records executed 
+Record 
+========================================= 
+Emp ID : 428 
+Emp Name : Mohith
+Record 
+========================================= 
+Emp ID : 417
+Emp Name : Tharun
+
+Record 
+========================================= 
+Emp ID : 421 
+Emp Name : Sudheesh
+Updating Records 
+1 of records affected 
+Record 
+========================================= 
+Emp ID : 428 
+Emp Name : Mohith Agasthyeswar
+Record 
+========================================= 
+Emp ID : 417
+Emp Name : Tharun
+
+Record 
+========================================= 
+Emp ID : 421 
+Emp Name : Sudheesh
+Deleting Table 
+==================
+
+
+
+
